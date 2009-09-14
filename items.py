@@ -4,24 +4,31 @@ from pymud.item import Item
 from pymud.persist import P
 from pymud.scheduler import Scheduler
 
-
 class Apple(Updatable,Item):
 
     ticksPerTurn = 5000
     description = "a delicious red apple"
-    attributes = {'name':'apple'}
+    attributes = ['red','delicious']
+    name = 'apple'
 
     def update(self,tick):
         self.__class__ = RottenApple
-        Scheduler.scheduler.schedule(self)
+        self.mutate()
+        self.sendLocationMessage("notice",
+            notice="The apple looks rotten at %d" % tick)
 
 class RottenApple(Updatable,Item):
 
-    ticksPerTurn = 1000
+    ticksPerTurn = 5000
     description = "a wormy rotten apple"
-    attributes = {'name':'apple'}
+    attributes = ['wormy','rotten']
+    name = 'apple'
 
     def update(self,tick):
-        P.persist.delete(self)
+        self.delete()
+        self.sendLocationMessage("notice",
+            notice="The worms have completely eaten the apple at %d" % tick)
+        
+
         
 
