@@ -5,15 +5,19 @@ from pymud.persist import P
 from pymud.room import Room
 from pymud.mob import Mob
 from pymud.item import Item
+from pymud import builder
+
+from mm.rooms import *
+from mm.items import *
 
 class Game():
 
     def buildWorld(self):
-        self.world = P.persist.getOrCreate("world",Room)
-        self.home = P.persist.getOrCreate("home",Room)
-        self.world.exits['home'] = P(self.home)
-        self.home.exits['world'] = P(self.world)
-        self.mob = P.persist.getOrCreate("mob",Mob)
-        self.world.add(self.mob)
-        self.thing = P.persist.getOrCreate("thing",Item)
-        self.world.add(self.thing)
+        self.world = builder.getOrCreate(Room,"world")
+        self.home = builder.getOrCreate(Grass,"home")
+        builder.addExit(self.world,'home',self.home)
+        builder.addExit(self.home,'world',self.world)
+        self.mob = builder.getOrCreate(Mob,"mob",self.world)
+        self.thing = builder.getOrCreate(Item,"thing",self.world)
+
+

@@ -4,6 +4,7 @@ from pymud.server import Server
 
 from mm.game import Game
 import mm.items
+import mm.rooms
 
 if __name__ == '__main__':
 
