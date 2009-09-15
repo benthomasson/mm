@@ -19,5 +19,6 @@ class Game():
         builder.addExit(self.home,'world',self.world)
         self.mob = builder.getOrCreate(Mob,"mob",self.world)
         self.thing = builder.getOrCreate(Item,"thing",self.world)
+        self.apple = builder.getOrCreate(Apple,"apple",self.world)
 
 

@@ -1,8 +1,6 @@
 
 from pymud.scriptable import Updatable
 from pymud.item import Item
-from pymud.persist import P
-from pymud.scheduler import Scheduler
 
 class Apple(Updatable,Item):
 
