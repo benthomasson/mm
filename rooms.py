@@ -1,10 +1,10 @@
 
 from pymud.room import Room
-from pymud.scriptable import Updatable
+from pymud.scriptable import Updatable, Mutable
 from pymud.exceptions import *
 
 
-class Grass(Updatable,Room):
+class Grass(Mutable,Updatable,Room):
 
     ticksPerTurn = 1000
     description = "tall green grass"
@@ -15,13 +15,6 @@ class Grass(Updatable,Room):
 
     def __init__(self,id=None):
         Room.__init__(self,id)
-
-    def update(self,tick):
-        self.lifetime += -1
-        if self.lifetime <= 0:
-            self.__class__ = Thorns
-            self.mutate()
-
 
 class Thorns(Updatable,Room):
 
@@ -36,6 +29,7 @@ class Thorns(Updatable,Room):
     def checkEnter(self,o):
         raise GameException("Thorns are impassible")
 
+Grass.nextClass = Thorns
 
 class Mountains(Updatable,Room):
 
