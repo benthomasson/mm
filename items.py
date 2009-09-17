@@ -28,5 +28,10 @@ class RottenApple(Updatable,Item):
             notice="The worms have completely eaten the apple at %d" % tick)
         
 
-        
+class Hat(Item):
+
+    description = "a felt hat"
+    detail = "a black felt hat"
+    name = "hat"
+    fitsInSlots = ['head']
 
