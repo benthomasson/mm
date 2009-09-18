@@ -9,6 +9,7 @@ from pymud import builder
 
 from mm.rooms import *
 from mm.items import *
+from mm.characters import *
 
 class Game():
 
