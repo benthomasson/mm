@@ -1,6 +1,7 @@
 
 from pymud.scriptable import Updatable
 from pymud.item import Item
+from pymud.admin import mutate
 
 class Apple(Updatable,Item):
 
@@ -35,3 +36,23 @@ class Hat(Item):
     name = "hat"
     fitsInSlots = ['head']
 
+def burn(self):
+    """\
+    Light a fire.
+
+    burn
+    """
+
+    mutate(self,'here','Fire')
+    self.sendMessage("notice",notice="You torch the place")
+        
+class Torch(Item):
+
+    description = "a lit torch"
+    detail = "the fiery light dispells darkness"
+    name = "torch"
+    fitsInSlots = ['hand']
+    commands = { 'burn': burn }
+
+        
+        
