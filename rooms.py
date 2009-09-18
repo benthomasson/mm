@@ -19,15 +19,28 @@ class Thorns(Updatable,Flammable,Room):
     def checkEnter(self,o):
         raise GameException("Thorns are impassible")
 
-class Grass(Mutable,Updatable,Flammable,Room):
+class TallGrass(Mutable,Updatable,Flammable,Room):
 
     ticksPerTurn = 1000
     description = "tall green grass"
     detail = "green blades waving in the wind"
+    mapCharacter = "/"
+    mapColor = "{LIGHTGREEN}"
+    lifetime = 50
+    nextClass = Thorns
+
+    def __init__(self,id=None):
+        Room.__init__(self,id)
+
+class Grass(Mutable,Updatable,Room):
+
+    ticksPerTurn = 1000
+    description = "green grass"
+    detail = "soft green carpet of grass"
     mapCharacter = "."
     mapColor = "{LIGHTGREEN}"
     lifetime = 10
-    nextClass = Thorns
+    nextClass = TallGrass
 
     def __init__(self,id=None):
         Room.__init__(self,id)
