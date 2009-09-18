@@ -2,6 +2,7 @@
 from pymud.scriptable import Updatable
 from pymud.item import Item
 from pymud.admin import mutate
+from mm.rooms import Flammable
 
 class Apple(Updatable,Item):
 
@@ -43,8 +44,12 @@ def burn(self):
     burn
     """
 
-    mutate(self,'here','Fire')
-    self.sendMessage("notice",notice="You torch the place")
+    if isinstance(self.location(),Flammable):
+        mutate(self,'here','Fire')
+        self.sendMessage("notice",notice="You torch the place")
+    else:
+        self.sendMessage("notice",notice="Your torch is ineffective")
+
         
 class Torch(Item):
 
@@ -53,6 +58,9 @@ class Torch(Item):
     name = "torch"
     fitsInSlots = ['hand']
     commands = { 'burn': burn }
+
+    def __call__(self,user):
+        burn(user)
 
         
         
