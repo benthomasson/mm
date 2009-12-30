@@ -14,25 +14,18 @@ from mm.characters import *
 class Game():
 
     def buildWorld(self):
-        self.world = builder.getOrCreate(Room,"world")
-        self.home = builder.getOrCreate(Grass,"home")
-        builder.addExit(self.world,'home',self.home)
-        builder.addExit(self.home,'world',self.world)
-        self.mob = builder.getOrCreate(Mob,"mob",self.world)
-        self.thing = builder.getOrCreate(Item,"thing",self.world)
-        self.apple = builder.getOrCreate(Apple,"apple",self.world)
+        #self.world = builder.getOrCreate(Room,"world")
+        #self.home = builder.getOrCreate(Grass,"home")
+        #self.world.addExit('home',self.home)
+        #self.home.addExit('world',self.world)
+        #self.mob = builder.getOrCreate(Mob,"mob",self.world)
+        #self.thing = builder.getOrCreate(Item,"thing",self.world)
+        #self.apple = builder.getOrCreate(Apple,"apple",self.world)
+        pass
 
-        self.zone = builder.addZoneFromMap("""\
-.....................
-.......^.............
-.......^^............
-.......^^^...........
-......^^.^^..........
-......^^..^^.........
-.......^.............
-.....................
-""",roomMap)
+    def other(self):
 
-        print self.zone.id
+        self.zone = builder.addZoneFromMapFile('zone','maps/map1',roomMap)
+        print self.zone.home.id
 
 

@@ -3,7 +3,7 @@
 import unittest
 from pymud.server import Server
 
-from pymud.game.game import Game
+from mm.game import Game
 
 
 class Test(unittest.TestCase):

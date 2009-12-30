@@ -14,6 +14,7 @@ if __name__ == '__main__':
 
     server.start()
     game.buildWorld()
+    game.other()
     server.run()
     server.close()
 
