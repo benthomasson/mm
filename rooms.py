@@ -1,4 +1,5 @@
 
+
 from pymud.room import Room
 from pymud.scriptable import Updatable, Mutable
 from pymud.exceptions import *
@@ -91,10 +92,4 @@ class Mountains(Updatable,Room):
 
     def checkEnter(self,o):
         raise GameException("Mountains are impassible")
-
-roomMap = {
-    '.':Grass,
-    'x':Thorns,
-    '^':Mountains,
-}
 
