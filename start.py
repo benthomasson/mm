@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from pymud.server import Server
+import pymud
 
 from mm.game import Game
 import mm.items

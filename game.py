@@ -8,6 +8,7 @@ from pymud.item import Item
 from pymud import builder
 
 from mm.rooms import *
+from mm.mobs import *
 from mm.items import *
 from mm.characters import *
 
