@@ -3,12 +3,12 @@
 from pymud.mob import Mob as BaseMob
 from pymud.chainedmap import ChainedMap
 import mm.commands
-from mm.rules import rules
+from mm.rules import mobRules
 
 class Mob(BaseMob):
 
     life = 2
-    rules = ChainedMap(map=rules)
+    rules = mobRules
 
 class Peon(Mob):
 

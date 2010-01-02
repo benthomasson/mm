@@ -1,11 +1,16 @@
 
 
-from pymud.room import Room
-from pymud.scriptable import Updatable, Mutable
+from pymud.room import Room as BaseRoom
+from pymud.scriptable import Updatable
 from pymud.exceptions import *
+from mm.rules import roomRules
 
 class Flammable(object):
     pass
+
+class Room(BaseRoom):
+
+    rules = roomRules
 
 class Thorns(Updatable,Flammable,Room):
 
@@ -20,7 +25,7 @@ class Thorns(Updatable,Flammable,Room):
     def checkEnter(self,o):
         raise GameException("Thorns are impassible")
 
-class TallGrass(Mutable,Updatable,Flammable,Room):
+class TallGrass(Updatable,Flammable,Room):
 
     ticksPerTurn = 1000
     description = "tall green grass"
@@ -33,7 +38,7 @@ class TallGrass(Mutable,Updatable,Flammable,Room):
     def __init__(self,id=None):
         Room.__init__(self,id)
 
-class Grass(Mutable,Updatable,Room):
+class Grass(Updatable,Room):
 
     ticksPerTurn = 1000
     description = "green grass"
@@ -47,7 +52,7 @@ class Grass(Mutable,Updatable,Room):
         Room.__init__(self,id)
 
 
-class Ash(Mutable,Updatable,Room):
+class Ash(Updatable,Room):
 
     ticksPerTurn = 1000
     description = "smouldering ash"
@@ -60,7 +65,7 @@ class Ash(Mutable,Updatable,Room):
     def __init__(self,id=None):
         Room.__init__(self,id)
 
-class Fire(Updatable,Mutable,Room):
+class Fire(Updatable,Room):
 
     ticksPerTurn = 1000
     description = "tongues of flame"
@@ -73,14 +78,7 @@ class Fire(Updatable,Mutable,Room):
     def __init__(self,id=None):
         Room.__init__(self,id)
 
-    def update(self,tick):
-        for exit in self.exits.values():
-            if exit and isinstance(exit(),Flammable):
-                exit().__class__ = Fire
-                exit().mutate()
-        Mutable.update(self,tick)
-
-class Mountains(Updatable,Room):
+class Mountains(Room):
 
     description = "tall impassible mountains"
     detail = "sheer craggy cliffs"
