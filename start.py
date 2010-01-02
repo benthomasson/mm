@@ -6,6 +6,7 @@ import pymud
 from mm.game import Game
 import mm.items
 import mm.rooms
+import mm.commands
 
 if __name__ == '__main__':
 
@@ -14,6 +15,7 @@ if __name__ == '__main__':
     game = Game()
 
     server.start()
+    server.creator.commands.update(mm.commands.commands)
     game.buildWorld()
     server.run()
     server.close()
