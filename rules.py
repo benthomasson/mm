@@ -6,7 +6,27 @@ def attributeEquals(attribute,value):
         return getattr(o,attribute) == value
     return _p
 
-LifeZero = attributeEquals('life',0)
+def attributeLessThan(attribute,value):
+    def _p(self,o):
+        return getattr(o,attribute) < value
+    return _p
+
+def attributeLessThanOrEqual(attribute,value):
+    def _p(self,o):
+        return getattr(o,attribute) <= value
+    return _p
+
+def attributeGreaterThan(attribute,value):
+    def _p(self,o):
+        return getattr(o,attribute) > value
+    return _p
+
+def attributeGreaterThanOrEqual(attribute,value):
+    def _p(self,o):
+        return getattr(o,attribute) >= value
+    return _p
+
+LifeZero = attributeLessThanOrEqual('life',0)
 
 def Delete(self,o):
     o.sendMessage('notice',notice='You died')
@@ -16,6 +36,5 @@ def Delete(self,o):
 
 Death = Rule(LifeZero,Delete)
 
-rules = {
-    '0_Death': Death,
-}
+rules = [ Death ]
+
