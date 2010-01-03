@@ -77,6 +77,7 @@ def MutateAction(self,o):
     o.mutate()
 
 def SpreadFire(self,o):
+    from mm.rooms import Flammable, Fire
     for exit in o.exits.values():
         if exit and isinstance(exit(),Flammable):
             exit().__class__ = Fire
@@ -89,6 +90,8 @@ def SpreadFire(self,o):
 Death = Rule(andfn(hasAttribute('life'),LifeZero),Delete)
 Age = Rule(hasAttribute('lifetime'),DecreaseLifetime)
 Mutate = Rule(andfn(hasAttribute('lifetime'),LifetimeZero),MutateAction)
+
+Burn = Rule(Pass,SpreadFire)
 
 mobRules = [ Death, Age, Mutate ]
 
