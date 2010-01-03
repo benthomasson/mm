@@ -3,7 +3,7 @@
 from pymud.room import Room as BaseRoom
 from pymud.scriptable import Updatable
 from pymud.exceptions import *
-from mm.rules import roomRules
+from mm.rules import roomRules, Burn
 
 class Flammable(object):
     pass
@@ -19,9 +19,6 @@ class Thorns(Updatable,Flammable,Room):
     mapCharacter = "x"
     mapColor = "{GREEN}"
 
-    def __init__(self,id=None):
-        Room.__init__(self,id)
-
     def checkEnter(self,o):
         raise GameException("Thorns are impassible")
 
@@ -35,9 +32,6 @@ class TallGrass(Updatable,Flammable,Room):
     lifetime = 50
     nextClass = Thorns
 
-    def __init__(self,id=None):
-        Room.__init__(self,id)
-
 class Grass(Updatable,Room):
 
     ticksPerTurn = 1000
@@ -47,10 +41,6 @@ class Grass(Updatable,Room):
     mapColor = "{LIGHTGREEN}"
     lifetime = 10
     nextClass = TallGrass
-
-    def __init__(self,id=None):
-        Room.__init__(self,id)
-
 
 class Ash(Updatable,Room):
 
@@ -62,9 +52,6 @@ class Ash(Updatable,Room):
     lifetime = 20
     nextClass = Grass
 
-    def __init__(self,id=None):
-        Room.__init__(self,id)
-
 class Fire(Updatable,Room):
 
     ticksPerTurn = 1000
@@ -74,9 +61,7 @@ class Fire(Updatable,Room):
     mapColor = "{RED}"
     lifetime = 3
     nextClass = Ash
-
-    def __init__(self,id=None):
-        Room.__init__(self,id)
+    rules = roomRules + [ Burn ]
 
 class Mountains(Room):
 
@@ -84,9 +69,6 @@ class Mountains(Room):
     detail = "sheer craggy cliffs"
     mapCharacter = "^"
     mapColor = "{WHITE}"
-
-    def __init__(self,id=None):
-        Room.__init__(self,id)
 
     def checkEnter(self,o):
         raise GameException("Mountains are impassible")
