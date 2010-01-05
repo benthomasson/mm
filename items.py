@@ -13,7 +13,7 @@ class Apple(Updatable,Item):
 
     def update(self,tick):
         self.__class__ = RottenApple
-        self.mutate()
+        self.reschedule()
         self.sendLocationMessage("notice",
             notice="The apple looks rotten at %d" % tick)
 

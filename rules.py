@@ -72,16 +72,25 @@ def Delete(self,o):
 
 DecreaseLifetime = increaseAttribute('lifetime',-1)
 
+def ResetLifeTime(self,o):
+    if o.__dict__.has_key('lifetime'):
+        del o.lifetime
+    if hasattr(o.__class__,'lifetime'):
+        o.lifetime = o.__class__.lifetime
+
+
 def MutateAction(self,o):
     o.__class__ = o.nextClass
-    o.mutate()
+    o.reschedule()
+    ResetLifeTime(self,o)
 
 def SpreadFire(self,o):
     from mm.rooms import Flammable, Fire
     for exit in o.exits.values():
         if exit and isinstance(exit(),Flammable):
             exit().__class__ = Fire
-            exit().mutate()
+            exit().reschedule()
+            ResetLifeTime(self,exit())
 
 
 
@@ -92,6 +101,9 @@ Age = Rule(hasAttribute('lifetime'),DecreaseLifetime)
 Mutate = Rule(andfn(hasAttribute('lifetime'),LifetimeZero),MutateAction)
 
 Burn = Rule(Pass,SpreadFire)
+
+
+### Rule Lists
 
 mobRules = [ Death, Age, Mutate ]
 
