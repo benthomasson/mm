@@ -1,61 +1,66 @@
 
 from pymud.rule import Rule, Pass, Fail, StopException, Action
 
+### Condition Factories
+
 def notfn(fn):
-    def _p(self,o):
-        return not fn(self,o)
+    def _p(rule,o):
+        return not fn(rule,o)
     return _p
 
 def andfn(*fns):
-    def _p(self,o):
+    def _p(rule,o):
         for fn in fns:
-            if not fn(self,o):
+            if not fn(rule,o):
                 return False
         return True
     return _p
 
 def orfn(*fns):
-    def _p(self,o):
+    def _p(rule,o):
         for fn in fns:
-            if fn(self,o):
+            if fn(rule,o):
                 return True
         return False
     return _p
 
 def attributeEquals(attribute,value):
-    def _p(self,o):
+    def _p(rule,o):
         return getattr(o,attribute) == value
     return _p
 
 def attributeLessThan(attribute,value):
-    def _p(self,o):
+    def _p(rule,o):
         return getattr(o,attribute) < value
     return _p
 
 def attributeLessThanOrEqual(attribute,value):
-    def _p(self,o):
+    def _p(rule,o):
         return getattr(o,attribute) <= value
     return _p
 
 def attributeGreaterThan(attribute,value):
-    def _p(self,o):
+    def _p(rule,o):
         return getattr(o,attribute) > value
     return _p
 
 def attributeGreaterThanOrEqual(attribute,value):
-    def _p(self,o):
+    def _p(rule,o):
         return getattr(o,attribute) >= value
     return _p
 
 def hasAttribute(attribute):
-    def _p(self,o):
+    def _p(rule,o):
         return hasattr(o,attribute)
     return _p
 
+### Action Factories
+
 def increaseAttribute(attribute,amount):
-    def _a(self,o):
+    def _a(rule,o):
         setattr(o,attribute,getattr(o,attribute) + amount)
     return _a
+
 
 ### Conditions
 
@@ -64,7 +69,7 @@ LifetimeZero = attributeLessThanOrEqual('lifetime',0)
 
 ### Actions
 
-def Delete(self,o):
+def Delete(rule,o):
     o.sendMessage('notice',notice='You died')
     o.sendLocationMessage('notice',notice='%s died' % o.name,exclude=o)
     o.delete()
@@ -72,25 +77,25 @@ def Delete(self,o):
 
 DecreaseLifetime = increaseAttribute('lifetime',-1)
 
-def ResetLifeTime(self,o):
+def ResetLifeTime(rule,o):
     if o.__dict__.has_key('lifetime'):
         del o.lifetime
     if hasattr(o.__class__,'lifetime'):
         o.lifetime = o.__class__.lifetime
 
 
-def MutateAction(self,o):
+def MutateAction(rule,o):
     o.__class__ = o.nextClass
     o.reschedule()
-    ResetLifeTime(self,o)
+    ResetLifeTime(rule,o)
 
-def SpreadFire(self,o):
+def SpreadFire(rule,o):
     from mm.rooms import Flammable, Fire
     for exit in o.exits.values():
         if exit and isinstance(exit(),Flammable):
             exit().__class__ = Fire
             exit().reschedule()
-            ResetLifeTime(self,exit())
+            ResetLifeTime(rule,exit())
 
 
 
