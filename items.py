@@ -1,8 +1,9 @@
 
 from pymud.scriptable import Updatable
-from pymud.item import Item
+from pymud.item import Item, FixedItem
 from pymud.admin import mutate
 from mm.rooms import Flammable
+from mm.rules import Pass, Rule, createInstanceInLocation
 
 class Apple(Updatable,Item):
 
@@ -62,5 +63,11 @@ class Torch(Item):
     def __call__(self,user):
         burn(user)
 
-        
-        
+class AppleTree(Updatable,FixedItem):
+
+    ticksPerTurn = 1000
+    description = "a grand tree"
+    detail = "tree filled with red apples"
+    name = "tree"
+    rules = [ Rule(Pass,createInstanceInLocation(Apple)) ]
+
