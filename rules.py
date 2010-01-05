@@ -1,5 +1,6 @@
 
 from pymud.rule import Rule, Pass, Fail, StopException, Action
+from pymud.util import *
 
 ### Condition Factories
 
@@ -61,6 +62,12 @@ def increaseAttribute(attribute,amount):
         setattr(o,attribute,getattr(o,attribute) + amount)
     return _a
 
+def createInstanceInLocation(klass):
+    print klass
+    def _a(rule,o):
+        i = createInstance(klass)
+        o.location().add(i)
+    return _a
 
 ### Conditions
 
