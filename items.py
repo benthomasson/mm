@@ -3,20 +3,11 @@ from pymud.scriptable import Updatable
 from pymud.item import Item, FixedItem
 from pymud.admin import mutate
 from mm.rooms import Flammable
-from mm.rules import Pass, Rule, createInstanceInLocation
+from mm.rules import Pass, Rule, createInstanceInLocation, progn,\
+    sendLocationMessage, MutateAction, Decay
 
-class Apple(Updatable,Item):
-
-    ticksPerTurn = 5000
-    description = "a delicious red apple"
-    attributes = ['red','delicious']
-    name = 'apple'
-
-    def update(self,tick):
-        self.__class__ = RottenApple
-        self.reschedule()
-        self.sendLocationMessage("notice",
-            notice="The apple looks rotten at %d" % tick)
+Disappear = Rule(Pass,progn(sendLocationMessage("notice",
+            notice="The worms have completely eaten the apple."), Decay))
 
 class RottenApple(Updatable,Item):
 
@@ -24,12 +15,18 @@ class RottenApple(Updatable,Item):
     description = "a wormy rotten apple"
     attributes = ['wormy','rotten']
     name = 'apple'
+    rules = [ Disappear ]
 
-    def update(self,tick):
-        self.delete()
-        self.sendLocationMessage("notice",
-            notice="The worms have completely eaten the apple at %d" % tick)
-        
+Rot = Rule(Pass,progn(MutateAction,sendLocationMessage("notice",notice="The apple looks rotten")))
+
+class Apple(Updatable,Item):
+
+    ticksPerTurn = 5000
+    description = "a delicious red apple"
+    attributes = ['red','delicious']
+    nextClass = RottenApple
+    name = 'apple'
+    rules = [ Rot ]
 
 class Hat(Item):
 
@@ -63,11 +60,14 @@ class Torch(Item):
     def __call__(self,user):
         burn(user)
 
+DropApple = Rule(Pass, progn(createInstanceInLocation(Apple),
+              sendLocationMessage("notice",notice="An apple dropped from the tree.")))
+
 class AppleTree(Updatable,FixedItem):
 
     ticksPerTurn = 1000
     description = "a grand tree"
     detail = "tree filled with red apples"
     name = "tree"
-    rules = [ Rule(Pass,createInstanceInLocation(Apple)) ]
+    rules = [ DropApple ]
 

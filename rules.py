@@ -57,6 +57,14 @@ def hasAttribute(attribute):
 
 ### Action Factories
 
+def progn(*fns):
+    def _a(rule,o):
+        last = None
+        for fn in fns:
+            last = fn(rule,o)
+        return last
+    return _a
+
 def increaseAttribute(attribute,amount):
     def _a(rule,o):
         setattr(o,attribute,getattr(o,attribute) + amount)
@@ -69,6 +77,16 @@ def createInstanceInLocation(klass):
         o.location().add(i)
     return _a
 
+def sendMessage(*args,**kwargs):
+    def _a(rule,o):
+        o.sendMessage(*args,**kwargs)
+    return _a
+
+def sendLocationMessage(*args,**kwargs):
+    def _a(rule,o):
+        o.sendLocationMessage(*args,**kwargs)
+    return _a
+
 ### Conditions
 
 LifeZero = attributeLessThanOrEqual('life',0)
@@ -76,7 +94,11 @@ LifetimeZero = attributeLessThanOrEqual('lifetime',0)
 
 ### Actions
 
-def Delete(rule,o):
+def Decay(rule,o):
+    o.delete()
+    raise StopException()
+
+def Die(rule,o):
     o.sendMessage('notice',notice='You died')
     o.sendLocationMessage('notice',notice='%s died' % o.name,exclude=o)
     o.delete()
@@ -108,7 +130,7 @@ def SpreadFire(rule,o):
 
 ### Rules
 
-Death = Rule(andfn(hasAttribute('life'),LifeZero),Delete)
+Death = Rule(andfn(hasAttribute('life'),LifeZero),Die)
 Age = Rule(hasAttribute('lifetime'),DecreaseLifetime)
 Mutate = Rule(andfn(hasAttribute('lifetime'),LifetimeZero),MutateAction)
 
@@ -118,6 +140,8 @@ Burn = Rule(Pass,SpreadFire)
 ### Rule Lists
 
 mobRules = [ Death, Age, Mutate ]
+mobChecks = [ Death, Age, Mutate ]
 
 roomRules = [ Age, Mutate ]
+roomChecks = [ Age, Mutate ]
 
