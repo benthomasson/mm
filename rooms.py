@@ -12,12 +12,22 @@ class Room(BaseRoom):
 
     rules = roomRules
 
+class Forest(Flammable,Room):
+
+    description = "dark haunting woods"
+    detail = "trees mostly"
+    mapCharacter = "+"
+    mapColor = "{GREEN}"
+
 class Thorns(Updatable,Flammable,Room):
 
+    ticksPerTurn = 1000
     description = "tall impassible thorns"
     detail = "sharp spines upon tangled vines"
     mapCharacter = "x"
     mapColor = "{GREEN}"
+    lifetime = 50
+    nextClass = Forest
 
     def checkEnter(self,o):
         raise GameException("Thorns are impassible")
