@@ -71,7 +71,6 @@ def increaseAttribute(attribute,amount):
     return _a
 
 def createInstanceInLocation(klass):
-    print klass
     def _a(rule,o):
         i = createInstance(klass)
         o.location().add(i)
