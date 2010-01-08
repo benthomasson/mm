@@ -2,7 +2,6 @@
 from pymud.scriptable import Updatable
 from pymud.item import Item, FixedItem
 from pymud.admin import mutate
-from mm.rooms import Flammable
 from mm.rules import Pass, Rule, createInstanceInLocation, progn,\
     sendLocationMessage, MutateAction, Decay
 
@@ -42,6 +41,7 @@ def burn(self):
     burn
     """
 
+    from mm.rooms import Flammable
     if isinstance(self.location(),Flammable):
         mutate(self,'here','Fire')
         self.sendMessage("notice",notice="You torch the place")
@@ -70,4 +70,12 @@ class AppleTree(Updatable,FixedItem):
     detail = "tree filled with red apples"
     name = "tree"
     rules = [ DropApple ]
+
+
+class FireWood(Item):
+
+    description = "fire wood"
+    name = "wood"
+    detail = "dense punky wood"
+
 

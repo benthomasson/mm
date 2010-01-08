@@ -3,7 +3,10 @@
 from pymud.room import Room as BaseRoom
 from pymud.scriptable import Updatable
 from pymud.exceptions import *
-from mm.rules import roomRules, Burn
+from pymud.choices import weighted_choices
+from pymud.rule import Rule
+from mm.rules import roomRules, Burn, mutateKlass, attributeLessThan
+from mm.items import FireWood
 
 class Flammable(object):
     pass
@@ -12,12 +15,26 @@ class Room(BaseRoom):
 
     rules = roomRules
 
+class LoggedForest(Updatable,Room):
+
+    ticksPerTurn = 1000
+    description = "stumps"
+    detail = "stumps and broom straw"
+    mapCharacter = "_"
+    mapColor = "{LIGHTBLACK}"
+    lifetime = 50
+    nextClass = None
+
 class Forest(Flammable,Room):
 
     description = "dark haunting woods"
     detail = "trees mostly"
     mapCharacter = "+"
     mapColor = "{GREEN}"
+    harvestChoices = weighted_choices({FireWood:1})
+    harvestAmount = 10
+    checks = [ Rule(attributeLessThan('harvestAmount',1),
+                    mutateKlass(LoggedForest)) ]
 
 class Thorns(Updatable,Flammable,Room):
 
@@ -51,6 +68,8 @@ class Grass(Updatable,Room):
     mapColor = "{LIGHTGREEN}"
     lifetime = 10
     nextClass = TallGrass
+
+LoggedForest.nextClass = Grass
 
 class Ash(Updatable,Room):
 

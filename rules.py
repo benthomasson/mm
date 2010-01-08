@@ -86,6 +86,13 @@ def sendLocationMessage(*args,**kwargs):
         o.sendLocationMessage(*args,**kwargs)
     return _a
 
+def mutateKlass(klass):
+    def _a(rule,o):
+        o.__class__ = klass
+        o.reschedule()
+        ResetLifeTime(rule,o)
+    return _a
+
 ### Conditions
 
 LifeZero = attributeLessThanOrEqual('life',0)
@@ -116,6 +123,7 @@ def MutateAction(rule,o):
     o.__class__ = o.nextClass
     o.reschedule()
     ResetLifeTime(rule,o)
+
 
 def SpreadFire(rule,o):
     from mm.rooms import Flammable, Fire
