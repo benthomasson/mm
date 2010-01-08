@@ -11,6 +11,7 @@ from mm.rooms import *
 from mm.mobs import *
 from mm.items import *
 from mm.characters import *
+import mm.plans
 
 roomMap = builder.buildRoomMapFile('maps/room')
 
