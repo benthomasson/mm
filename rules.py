@@ -1,147 +1,168 @@
 
-from pymud.rule import Rule, Pass, Fail, StopException, Action
+from pymud.rule import Rule, Pass, Fail, StopException, And, Condition, Action
 from pymud.util import *
 
 ### Condition Factories
 
-def notfn(fn):
-    def _p(rule,o):
-        return not fn(rule,o)
-    return _p
+class AttributeEquals(Condition):
+    
+    def __init__(self,attribute,value):
+        self.attribute = attribute
+        self.value = value
 
-def andfn(*fns):
-    def _p(rule,o):
-        for fn in fns:
-            if not fn(rule,o):
-                return False
-        return True
-    return _p
+    def __call__(self,rule,o):
+        return getattr(o,self.attribute) == self.value
 
-def orfn(*fns):
-    def _p(rule,o):
-        for fn in fns:
-            if fn(rule,o):
-                return True
-        return False
-    return _p
+class AttributeLessThan(Condition):
+    
+    def __init__(self,attribute,value):
+        self.attribute = attribute
+        self.value = value
 
-def attributeEquals(attribute,value):
-    def _p(rule,o):
-        return getattr(o,attribute) == value
-    return _p
+    def __call__(self,rule,o):
+        return getattr(o,self.attribute) < self.value
 
-def attributeLessThan(attribute,value):
-    def _p(rule,o):
-        return getattr(o,attribute) < value
-    return _p
+class AttributeLessThanOrEqual(Condition):
+    
+    def __init__(self,attribute,value):
+        self.attribute = attribute
+        self.value = value
 
-def attributeLessThanOrEqual(attribute,value):
-    def _p(rule,o):
-        return getattr(o,attribute) <= value
-    return _p
+    def __call__(self,rule,o):
+        return getattr(o,self.attribute) <= self.value
 
-def attributeGreaterThan(attribute,value):
-    def _p(rule,o):
-        return getattr(o,attribute) > value
-    return _p
+class AttributeGreaterThan(Condition):
+    
+    def __init__(self,attribute,value):
+        self.attribute = attribute
+        self.value = value
 
-def attributeGreaterThanOrEqual(attribute,value):
-    def _p(rule,o):
-        return getattr(o,attribute) >= value
-    return _p
+    def __call__(self,rule,o):
+        return getattr(o,self.attribute) > self.value
 
-def hasAttribute(attribute):
-    def _p(rule,o):
-        return hasattr(o,attribute)
-    return _p
+class AttributeGreaterThanOrEqual(Condition):
+    
+    def __init__(self,attribute,value):
+        self.attribute = attribute
+        self.value = value
+
+    def __call__(self,rule,o):
+        return getattr(o,self.attribute) >= self.value
+
+class HasAttribute(Condition):
+    
+    def __init__(self,attribute):
+        self.attribute = attribute
+
+    def __call__(self,rule,o):
+        return hasattr(o,self.attribute)
 
 ### Action Factories
 
-def progn(*fns):
-    def _a(rule,o):
-        last = None
-        for fn in fns:
-            last = fn(rule,o)
-        return last
-    return _a
+class IncreaseAttribute(Action):
+    
+    def __init__(self,attribute,amount):
+        self.attribute = attribute
+        self.amount = amount
 
-def increaseAttribute(attribute,amount):
-    def _a(rule,o):
-        setattr(o,attribute,getattr(o,attribute) + amount)
-    return _a
+    def __call__(self,rule,o,result):
+        setattr(o,self.attribute,getattr(o,self.attribute) + self.amount)
 
-def createInstanceInLocation(klass):
-    def _a(rule,o):
-        i = createInstance(klass)
+class CreateInstanceInLocation(Action):
+    
+    def __init__(self,klass):
+        self.klass = klass
+
+    def __call__(self,rule,o,result):
+        i = createInstance(self.klass)
         o.location().add(i)
-    return _a
 
-def sendMessage(*args,**kwargs):
-    def _a(rule,o):
-        o.sendMessage(*args,**kwargs)
-    return _a
+class SendMessage(Action):
+    
+    def __init__(self,*args,**kwargs):
+        self.args = args
+        self.kwargs = kwargs
 
-def sendLocationMessage(*args,**kwargs):
-    def _a(rule,o):
-        o.sendLocationMessage(*args,**kwargs)
-    return _a
+    def __call__(self,rule,o,result):
+        o.sendMessage(*self.args,**self.kwargs)
 
-def mutateKlass(klass):
-    def _a(rule,o):
-        o.__class__ = klass
+class SendLocationMessage(Action):
+    
+    def __init__(self,*args,**kwargs):
+        self.args = args
+        self.kwargs = kwargs
+
+    def __call__(self,rule,o,result):
+        o.sendLocationMessage(*self.args,**self.kwargs)
+
+class MutateKlass(Action):
+    
+    def __init__(self,klass):
+        self.klass = klass
+
+    def __call__(self,rule,o,result):
+        o.__class__ = self.klass
         o.reschedule()
         ResetLifeTime(rule,o)
-    return _a
 
 ### Conditions
 
-LifeZero = attributeLessThanOrEqual('life',0)
-LifetimeZero = attributeLessThanOrEqual('lifetime',0)
+LifeZero = AttributeLessThanOrEqual('life',0)
+LifetimeZero = AttributeLessThanOrEqual('lifetime',0)
 
 ### Actions
 
-def Decay(rule,o):
-    o.delete()
-    raise StopException()
+class Decay(Action):
+    
+    def __call__(self,rule,o,result):
+        o.delete()
+        raise StopException()
 
-def Die(rule,o):
-    o.sendMessage('notice',notice='You died')
-    o.sendLocationMessage('notice',notice='%s died' % o.name,exclude=o)
-    o.delete()
-    raise StopException()
+class Die(Action):
+    
+    def __call__(self,rule,o,result):
+        o.sendMessage('notice',notice='You died')
+        o.sendLocationMessage('notice',notice='%s died' % o.name,exclude=o)
+        o.delete()
+        raise StopException()
 
-DecreaseLifetime = increaseAttribute('lifetime',-1)
+DecreaseLifetime = IncreaseAttribute('lifetime',-1)
 
-def ResetLifeTime(rule,o):
-    if o.__dict__.has_key('lifetime'):
-        del o.lifetime
-    if hasattr(o.__class__,'lifetime'):
-        o.lifetime = o.__class__.lifetime
-
-
-def MutateAction(rule,o):
-    o.__class__ = o.nextClass
-    o.reschedule()
-    ResetLifeTime(rule,o)
-
-
-def SpreadFire(rule,o):
-    from mm.rooms import Flammable, Fire
-    for exit in o.exits.values():
-        if exit and isinstance(exit(),Flammable):
-            exit().__class__ = Fire
-            exit().reschedule()
-            ResetLifeTime(rule,exit())
+class ResetLifeTime(Action):
+    
+    def __call__(self,rule,o,result):
+        if o.__dict__.has_key('lifetime'):
+            del o.lifetime
+        if hasattr(o.__class__,'lifetime'):
+            o.lifetime = o.__class__.lifetime
 
 
+class MutateAction(ResetLifeTime):
+    
+    def __call__(self,rule,o,result):
+        o.__class__ = o.nextClass
+        o.reschedule()
+        ResetLifeTime.__call__(self,rule,o,result)
+
+
+class SpreadFire(ResetLifeTime):
+    
+    
+    def __call__(self,rule,o,result):
+        from mm.rooms import Flammable, Fire
+        for exit in o.exits.values():
+            if exit and isinstance(exit(),Flammable):
+                exit().__class__ = Fire
+                exit().reschedule()
+                ResetLifeTime.__call__(self,rule,exit(),result)
 
 ### Rules
 
-Death = Rule(andfn(hasAttribute('life'),LifeZero),Die)
-Age = Rule(hasAttribute('lifetime'),DecreaseLifetime)
-Mutate = Rule(andfn(hasAttribute('lifetime'),LifetimeZero),MutateAction)
+Death = Rule(And(HasAttribute('life'),LifeZero),Die())
+Age = Rule(HasAttribute('lifetime'),DecreaseLifetime)
+Mutate = Rule(And(HasAttribute('lifetime'),LifetimeZero),MutateAction())
 
-Burn = Rule(Pass,SpreadFire)
+Burn = Rule(Pass,SpreadFire())
 
 
 ### Rule Lists
